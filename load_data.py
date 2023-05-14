@@ -4,8 +4,8 @@ import boto3
 if __name__ == '__main__':
       s3 = boto3.client('s3',
                         endpoint_url='https://storage.yandexcloud.net',
-                        aws_access_key_id='YCAJEffTHMPCfFn4jBYUDB6oV',
-                        aws_secret_access_key='YCNdxgyAtr7bUzU0iIQeQi9ViIJ7GS-ZdbiR3Fyo')
+                        aws_access_key_id=os.environ['access_key'],
+                        aws_secret_access_key=os.environ['secret'])
 
       bucket_name = 'sikoraaxd-bucket'
 
