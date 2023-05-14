@@ -20,7 +20,36 @@ class ResNetModel(nn.Module):
   
   def forward(self, x):
     return self.resnet(x)
+  
 
+class CNN(nn.Module):
+  def __init__(self):
+    super().__init__()
+    self.model = nn.Sequential(
+        nn.Conv2d(in_channels=3, out_channels=64, kernel_size=3, padding=1),
+        nn.BatchNorm2d(num_features=64),
+        nn.ReLU(),
+        nn.MaxPool2d(kernel_size=2),
+
+        nn.Conv2d(in_channels=64, out_channels=256, kernel_size=3, padding=1),
+        nn.BatchNorm2d(num_features=256),
+        nn.ReLU(),
+        nn.MaxPool2d(kernel_size=2),
+
+        nn.Conv2d(in_channels=256, out_channels=256, kernel_size=3, padding=1),
+        nn.BatchNorm2d(num_features=256),
+        nn.ReLU(),
+        nn.MaxPool2d(kernel_size=2),
+
+        nn.AdaptiveAvgPool2d(output_size=(2,2)),
+        nn.Flatten(),
+        nn.Linear(256*2*2, 64),
+        nn.Linear(64, 163)
+    )
+  
+  def forward(self, x):
+    return self.model(x)
+  
 
 def train_function(model, train_dataloader, loss_fn, device):
     LR=0.001
@@ -61,24 +90,34 @@ def train_function(model, train_dataloader, loss_fn, device):
 
     return best_model
 
+
 if __name__ == "__main__":
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     transform = transforms.Compose([
-    transforms.Resize((1280, 720)),
     transforms.RandomHorizontalFlip(),
-    transforms.ToTensor()
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
     train = ImageFolder(root='./train', transform=transform)
 
-    train_dl = DataLoader(train, batch_size=128, shuffle=True)
+    train_dl = DataLoader(train, batch_size=512, shuffle=True)
     
     resnet_model = ResNetModel().to(device)
+    cnn_model = CNN().to(device)
     loss_fn = nn.CrossEntropyLoss()
-    best_model = train_function(model = resnet_model, 
+    best_model1 = train_function(model = resnet_model, 
                                         train_dataloader=train_dl,
                                         loss_fn=loss_fn,
                                         device=device)
     
-    torch.save(best_model, 'quick_lol.pth')
-    save_data('quick_lol.pth')
+    best_model2 = train_function(model = cnn_model, 
+                                        train_dataloader=train_dl,
+                                        loss_fn=loss_fn,
+                                        device=device)
+    
+    torch.save(best_model1, 'quick_lol1.pth')
+    save_data('quick_lol1.pth')
+
+    torch.save(best_model2, 'quick_lol2.pth')
+    save_data('quick_lol2.pth')
