@@ -9,6 +9,6 @@ if __name__ == '__main__':
 
       bucket_name = 'sikoraaxd-bucket'
 
-      response = s3.get_object(Bucket=bucket_name, Key='train.rar')
-      with open('./train.rar', 'wb') as f:
+      response = s3.get_object(Bucket=bucket_name, Key='train.zip')
+      with open('./train.zip', 'wb') as f:
           f.write(response['Body'].read())
