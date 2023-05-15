@@ -10,7 +10,7 @@ from save_results import save_data
 class ResNetModel(nn.Module):
   def __init__(self):
     super().__init__()
-    self.resnet = models.resnet50(pretrained=True)
+    self.resnet = models.resnet50(weights=True)
     for param in self.resnet.parameters():
       param.requires_grad = False
 
